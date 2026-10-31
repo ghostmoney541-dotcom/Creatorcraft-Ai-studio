@@ -10,8 +10,7 @@ const tools = [
 { name: “Jingle Foundry”, description: “Develop memorable advertising and brand jingle concepts.”, icon: “♪” },
 { name: “Brand Forge”, description: “Explore logos, visual identities, and brand concepts.”, icon: “⚒” },
 { name: “Website Builder”, description: “Plan websites for creators and small businesses.”, icon: “⌘” },
-{ name: “Growth Engine”, description: “Build content calendars and marketing plans.”, icon: “↗” },
-];
+{ name: “Growth Engine”, description: “Build content calendars and marketing 
 
 export default function Home() {
 const [selected, setSelected] = useState(“AI Music Lab”);
