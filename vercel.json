@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "creatorcraft-ai": {
+      "root": "creatorcraft-ai",
+      "framework": "nextjs"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "creatorcraft-ai"
+      }
+    }
+  ]
+}
