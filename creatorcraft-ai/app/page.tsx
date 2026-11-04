@@ -48,15 +48,43 @@ const tools = [
 export default function Home() {
   const [selected, setSelected] = useState("AI Music Lab");
   const [idea, setIdea] = useState("");
-  const [message, setMessage] = useState("");
+  const [result, setResult] = useState("");
+  const [error, setError] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  function createProject() {
+  async function createProject() {
     if (!idea.trim()) {
-      setMessage("Enter a project idea first.");
+      setError("Enter a project idea first.");
+      setResult("");
       return;
     }
 
-    setMessage(`Project brief created for ${selected}: ${idea}`);
+    setIsGenerating(true);
+    setError("");
+    setResult("");
+
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tool: selected, idea }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Generation failed. Please try again.");
+      }
+
+      setResult(data.result);
+    } catch (generationError) {
+      setError(
+        generationError instanceof Error
+          ? generationError.message
+          : "Generation failed. Please try again."
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   }
 
   return (
@@ -101,7 +129,8 @@ export default function Home() {
               key={tool.name}
               onClick={() => {
                 setSelected(tool.name);
-                setMessage("");
+                setError("");
+                setResult("");
               }}
               type="button"
             >
@@ -123,19 +152,30 @@ export default function Home() {
             onChange={(event) => setIdea(event.target.value)}
             placeholder="Tell us your idea, mood, style, or goal..."
             rows={4}
+            maxLength={4000}
           />
-          <button className="primary-button" onClick={createProject} type="button">
-            CREATE PROJECT BRIEF ↗
+          <button
+            className="primary-button"
+            onClick={createProject}
+            type="button"
+            disabled={isGenerating}
+          >
+            {isGenerating ? "CREATING YOUR BRIEF…" : "CREATE PROJECT BRIEF ↗"}
           </button>
-          {message && (
-            <p className="feedback" role="status">
-              {message}
+          {error && (
+            <p className="feedback" role="alert">
+              {error}
             </p>
           )}
+          {result && (
+            <div className="feedback" role="status" aria-live="polite">
+              <h3>Your {selected} brief</h3>
+              <p style={{ whiteSpace: "pre-wrap" }}>{result}</p>
+            </div>
+          )}
           <p className="disclaimer">
-            Prototype preview: this form creates a project brief locally. AI
-            generation, publishing, payments, and external services are not
-            connected yet.
+            AI-generated creative concepts. Music and video tools create plans
+            and text, not audio or video files.
           </p>
         </div>
       </section>
